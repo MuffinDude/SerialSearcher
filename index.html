@@ -95,7 +95,7 @@
 
     <div id="popular" data-role="page">
 		<div data-role="header">
-			<h1>Most popular shows</h1>
+			<h1>Popular</h1>
             <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
         </div>
 		<div data-role="main" class="ui-content">
@@ -110,7 +110,7 @@
                             for(i=0;i<20;i++){
                                 var movieName = datas.results[i].name;
                                 var movieDescriptionUno = datas.results[i].overview;
-                                var movieDescription = movieDescriptionUno.substr(0,200);
+                                var movieDescription = movieDescriptionUno.substr(0,175);
                                 var imageSource = "http://image.tmdb.org/t/p/w300" + datas.results[i].poster_path;
                                 var showID = datas.results[i].id;
 				                $('#mostPopular').append(
@@ -181,7 +181,7 @@
 				            for(i=0;i<15;i++){
                                 var movieName = datas.results[i].name;
                                 var movieDescriptionUno = datas.results[i].overview;
-                                var movieDescription = movieDescriptionUno.substr(0,250);
+                                var movieDescription = movieDescriptionUno.substr(0,200);
                                 var showID = datas.results[i].id;
                                 var imageSource = "http://image.tmdb.org/t/p/w300" + datas.results[i].poster_path;
 				                $('#results').append(
