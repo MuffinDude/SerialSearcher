@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html manifest='manifest.appcache'>
+<html>
+<head>
+	<title>SerialSearcher</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta charset = "utf-8">
+	<link rel="apple-touch-icon" href="ss.png">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
+
+	<style>
+	div[data-role=footer]{
+		-webkit-user-select:none;
+		user-select:none;
+		cursor:default;
+	}
+	</style>
+
+</head>
+<body>
+	
+	<div id="home" data-role="page">
+		<div data-role="header">
+			<h1>SerialSearcher</h1>
+		</div>
+		<div data-role="main" class="ui-content">
+			<ul data-role="listview">
+				<li><a href="#popular" data-transition="slide">Popular</a></li>
+				<li><a href="#favorites" data-transition="slide">Favorites</a></li>
+				<li><a href="#search" data-transition="slide">Search</a></li>
+			</ul>
+		</div>
+		<div data-role="footer" data-position="fixed">
+			<p>Made by Joosep Tiismus 134552IAPB43</p>
+		</div>
+	</div>
+
+	<!-- Favorites -->
+
+	<div id="favorites" data-role="page">
+		<div data-role="header">
+			<h1>Your favorite shows</h1>
+            <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
+		</div>
+		<div data-role="main" class="ui-content">
+            <div id="favoriteList"></div>
+		</div>
+		
+		<script>
+            for (var i = 0; i < localStorage.length; i++){
+                $('#favoriteList').append(localStorage.getItem(localStorage.key(i)));
+            }
+            
+            function addToFavorites(name){
+                var splitString = name.split("¤");
+                var supernat= "Supernatural";
+                localStorage.setItem(splitString[0],splitString[0] + "<button onclick='destroyMe("+supernat+")'>Delete</button>");
+                $('#favoriteList').append(
+                                    '<br>' + 
+                                    '<ul data-role="listview" id="'+splitString[0]+'">' + 
+                                    '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+splitString[0]+'¤'+splitString[2]+'¤'+splitString[1]+'\');">' +
+                                    '<img src= "'+splitString[1]+'" height="70">' + 
+                                    splitString[0] + 
+                                    '<a href="#" data-icon="delete" onclick="removeFromFavorites(\''+splitString[0]+'\');">&nbsp;</a></a></li></ul>');
+            }
+            
+            function removeFromFavorites(name){
+                var removableElement = document.getElementById(name);
+                removableElement.parentNode.removeChild(removableElement);
+                return false;
+            }
+            
+            function destroyAll(){
+                localStorage.clear();
+            }
+            
+            function destroyMe(key){
+                localStorage.removeItem(key);
+            }
+           
+        </script>
+		
+		<div data-role="footer" data-position="fixed">
+			<p>Made by Joosep Tiismus 134552IAPB43</p>
+			<button onclick="destroyAll()">Delete Favorites in Storage</button>
+		</div>
+    </div>
+    
+	<!-- Popular -->
+
+    <div id="popular" data-role="page">
+		<div data-role="header">
+			<h1>Most popular shows</h1>
+            <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
+        </div>
+		<div data-role="main" class="ui-content">
+            <div id="mostPopular"></div>
+            <script>
+                function getPopular(){
+                    var apiKey = "609ebf66c9f448c9c1f5a207ad8b7bd2";
+                    var url = "https://api.themoviedb.org/3/tv/popular";
+                    $.get(url, { api_key: apiKey })
+                        .done(function (datas) {
+                            console.log(datas.results);
+                            for(i=0;i<20;i++){
+                                var movieName = datas.results[i].name;
+                                var movieDescriptionUno = datas.results[i].overview;
+                                var movieDescription = movieDescriptionUno.substr(0,200);
+                                var imageSource = "http://image.tmdb.org/t/p/w300" + datas.results[i].poster_path;
+                                var showID = datas.results[i].id;
+				                $('#mostPopular').append(
+                                        '<br>' + 
+                                        '<ul data-role="listview">' + 
+                                        '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+movieName+'¤'+movieDescription+'¤'+imageSource+'¤'+showID+'\');">' +
+                                        '<img src= "http://image.tmdb.org/t/p/w300' +
+                                        datas.results[i].poster_path +
+                                        '" height="70">' + 
+                                        datas.results[i].name + 
+                                        '<a href="#" data-icon="star" onclick="addToFavorites(\''+movieName+'¤'+imageSource+'¤'+movieDescription+'\');">&nbsp;</a></a></li></ul>');
+                            }
+                        })
+                        .fail(function(error) {
+                            console.error(error);
+                        });
+                }
+                getPopular();
+            </script>
+		</div>
+		<div data-role="footer" data-position="fixed">
+			<p>Made by Joosep Tiismus 134552IAPB43</p>
+		</div>
+    </div>
+    
+	<!-- Search -->
+
+    <div id="search" data-role="page">
+		<div data-role="header">
+			<h1>Search new shows</h1>
+			<a href="#home" data-transition="slide" data-direction="reverse">Home</a>
+		</div>
+		<div data-role="main" class="ui-content">
+            <input type="text" name="searches" id="searches" autofocus> <br>
+            <div id="results" data-role="listview"></div>   
+            <div id="history"></div>
+            
+            <script>
+                var historySearches=[];
+                $("#searches").keypress(function(event) {
+                    if (event.which == 13 || event.keyCode == 13) {
+                        var input = document.getElementById('searches').value;
+                        $("#results").empty();
+                        getSearches(input);
+                        if(historySearches.length<=10){
+                        historySearches.push(input + "<br>");
+                        document.getElementById("history").innerHTML = historySearches;
+                        }else{
+                            $("#history").empty();
+                            for(i=0;i<10;i++){
+                                historySearches[i]=historySearches[i+1];
+                                historySearches[10]=input + "<br>";
+                            }
+                            document.getElementById("history").innerHTML = historySearches;
+                        }
+                        return false;
+                    }   
+                });
+                
+                function getSearches(data){
+                    var apiKey = "609ebf66c9f448c9c1f5a207ad8b7bd2";
+                    var url = "http://api.themoviedb.org/3/search/tv";
+                    
+                    $.get(url, { api_key: apiKey, query: data })
+                        .done(function (datas) {
+                            console.log(datas);
+                        
+				            for(i=0;i<15;i++){
+                                var movieName = datas.results[i].name;
+                                var movieDescriptionUno = datas.results[i].overview;
+                                var movieDescription = movieDescriptionUno.substr(0,250);
+                                var showID = datas.results[i].id;
+                                var imageSource = "http://image.tmdb.org/t/p/w300" + datas.results[i].poster_path;
+				                $('#results').append(
+                                        '<br>'+
+                                       '<ul data-role="listview">' +
+                                        '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+movieName+'¤'+movieDescription+'¤'+imageSource+'¤'+showID+'\');">' + 
+                                        '<img src= "http://image.tmdb.org/t/p/w300' +
+                                        datas.results[i].poster_path +
+                                        '" height="70">' + 
+                                        datas.results[i].name + 
+                                        '</a></li></ul>'
+                                );
+                            }
+                        })
+                        .fail(function(error) {
+                            console.error(error);
+                        });
+                }
+            </script>
+            
+		</div>
+		<div data-role="footer" data-position="fixed">
+			<p>Made by Joosep Tiismus 134552IAPB43</p>
+		</div>
+    </div>
+    
+	<!-- Single Movie -->
+
+	<div id="show" data-role="page">
+		<div data-role="header">
+			<h1 id="showTitle"></h1>
+            <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
+		</div>
+		<div data-role="main" class="ui-content">
+			<ul data-role="listview">
+				<img src="ss.png" alt="No Picture Available" id="superImage">
+				<p id="showDescription"></p>
+				<p id="showYears"></p>
+				<div id="trailerino"></div>
+				<div id="favoritePlease"></div>
+				<div id="episodeList"></div>
+			</ul>
+		</div>
+		
+		<script>
+            function OneMoviePage(name){
+                
+                $("#showTitle").empty();
+                $("#showDescription").empty();
+                $("#superImage").empty();
+                $("#trailerino").empty();
+                $("#favoritePlease").empty();
+                $("#episodeList").empty();
+                
+                var splitString = name.split("¤");
+                $('#showTitle').append(splitString[0]);
+                $('#showDescription').append(splitString[1]);
+                $('#superImage').attr("src", splitString[2]);
+                $('#trailerino').append('<a href="http://www.youtube.com/results?search_query='+splitString[0]+'+trailer" id="mainTrailer">Trailer</a>');
+                $('#favoritePlease').append('<a href="#" data-icon="star" onclick="addToFavorites(\''+splitString[0]+'¤'+splitString[2]+'¤'+splitString[1]+'\');">Add to Favorites &nbsp;</a>');
+                
+                var showID = splitString[3];
+                console.log("SELLE FKAIN SHOW ID ON : " + showID);
+                var apiKey = "609ebf66c9f448c9c1f5a207ad8b7bd2";
+                var urlid = "http://api.themoviedb.org/3/tv/" + showID;
+                
+                    $.get(urlid, { api_key: apiKey })
+                        .done(function (datas) {
+                            var episodeCount = datas.number_of_episodes;
+                            console.log(episodeCount);
+				            for(i=0;i<episodeCount;i++){
+				                $('#episodeList').append( "<li><p for='flip-1'>Episode number: " + i +"   "+
+                                "<select name='flip-1' id='flip-1' data-role='slider'><option value='off'>Not seen</option><option value='on'>Seen</option></select> " +
+                                "</li></p>"
+                                );
+                            }
+                        })
+                        .fail(function(error) {
+                            console.error(error);
+                        });
+            }
+        </script>
+		
+		<div data-role="footer" data-position="fixed">
+			<p>Made by Joosep Tiismus 134552IAPB43</p>
+		</div>
+</body>
+</html>
