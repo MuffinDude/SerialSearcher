@@ -58,8 +58,7 @@
             
             function addToFavorites(name){
                 var splitString = name.split("¤");
-                var supernat= "Supernatural";
-                localStorage.setItem(splitString[0],splitString[0] + "<button onclick='destroyMe("+supernat+")'>Delete</button>");
+                localStorage.setItem(splitString[0],splitString[0] + "<button onclick='destroyMe(\""+splitString[0]+"\")'>Delete</button>");
                 $('#favoriteList').append(
                                     '<br>' + 
                                     '<ul data-role="listview" id="'+splitString[0]+'">' + 
@@ -80,6 +79,7 @@
             }
             
             function destroyMe(key){
+                console.log("key on " + key);
                 localStorage.removeItem(key);
             }
            
