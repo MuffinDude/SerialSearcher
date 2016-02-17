@@ -44,7 +44,7 @@
 
 	<div id="favorites" data-role="page">
 		<div data-role="header">
-			<h1>Your favorite shows</h1>
+			<h1>Favorites</h1>
             <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
 		</div>
 		<div data-role="main" class="ui-content">
@@ -52,8 +52,12 @@
 		</div>
 		
 		<script>
-            for (var i = 0; i < localStorage.length; i++){
-                $('#favoriteList').append(localStorage.getItem(localStorage.key(i)));
+            if(!navigator.onLine){
+                alert('you are offline');
+                var div = document.getElementById('favoriteList');
+                for (var i = 0; i < localStorage.length; i++){
+                    div.innerHTML = div.innerHTML + localStorage.getItem(localStorage.key(i));
+                }
             }
             
             function addToFavorites(name){
