@@ -7,11 +7,11 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta charset = "utf-8">
-	<link rel="apple-touch-icon" href="ss.png">
+	<link rel="stylesheet" type="text/css" href="style.css">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
+	<script src="code/jquery-2.2.0.min.js"></script>
+	<link rel="stylesheet" href="code/jquery.mobile-1.4.5.min.css">
+	<script src="code/jquery.mobile-1.4.5.min.js"></script>
 
 	<style>
 	div[data-role=footer]{
@@ -25,25 +25,29 @@
 <body>
 	
 	<div id="home" data-role="page">
-		<div data-role="header">
+		<div data-role="header" id="headerino">
 			<h1>SerialSearcher</h1>
 		</div>
 		<div data-role="main" class="ui-content">
 			<ul data-role="listview">
 				<li><a href="#popular" data-transition="slide">Popular</a></li>
-				<li><a href="#favorites" data-transition="slide">Favorites</a></li>
+				<li><a href="#favorites" data-transition="slide" onclick="resetBecauseJquery();">Favorites</a></li>
 				<li><a href="#search" data-transition="slide">Search</a></li>
 			</ul>
 		</div>
-		<div data-role="footer" data-position="fixed">
+		<div data-role="footer" data-position="fixed" id="footerino">
 			<p>Made by Joosep Tiismus 134552IAPB43</p>
 		</div>
 	</div>
+	<script>
+        function resetBecauseJquery(){ 
+            location.reload();}
+    </script>
 
 	<!-- Favorites -->
 
 	<div id="favorites" data-role="page">
-		<div data-role="header">
+		<div data-role="header" id="headerino">
 			<h1>Favorites</h1>
             <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
 		</div>
@@ -54,29 +58,28 @@
 		<script>
             if(!navigator.onLine){
                 alert('you are offline');
-                var div = document.getElementById('favoriteList');
+            }
+            //LOCALSTORAGE ADD STUFF
+            var div = document.getElementById('favoriteList');
                 for (var i = 0; i < localStorage.length; i++){
+                    if(localStorage.getItem(localStorage.key(i)).length>10){
                     div.innerHTML = div.innerHTML + localStorage.getItem(localStorage.key(i));
                 }
             }
             
             function addToFavorites(name){
+                $('.error').stop().fadeIn(400).delay(1000).fadeOut(400);
                 var splitString = name.split("¤");
-                localStorage.setItem(splitString[0],splitString[0] + "<button onclick='destroyMe(\""+splitString[0]+"\")'>Delete</button>");
-                $('#favoriteList').append(
-                                    '<br>' + 
+                localStorage.setItem(splitString[0],'<br>' + 
                                     '<ul data-role="listview" id="'+splitString[0]+'">' + 
-                                    '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+splitString[0]+'¤'+splitString[2]+'¤'+splitString[1]+'\');">' +
+                                    '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+splitString[0]+'¤'+splitString[1]+'¤'+splitString[2]+'\');">' +
                                     '<img src= "'+splitString[1]+'" height="70">' + 
                                     splitString[0] + 
-                                    '<a href="#" data-icon="delete" onclick="removeFromFavorites(\''+splitString[0]+'\');">&nbsp;</a></a></li></ul>');
+                                    '<a href="#" data-icon="delete" onclick="destroyMe(\''+splitString[0]+'\');">&nbsp;</a></a></li></ul>');
+                
+                
             }
             
-            function removeFromFavorites(name){
-                var removableElement = document.getElementById(name);
-                removableElement.parentNode.removeChild(removableElement);
-                return false;
-            }
             
             function destroyAll(){
                 localStorage.clear();
@@ -85,11 +88,12 @@
             function destroyMe(key){
                 console.log("key on " + key);
                 localStorage.removeItem(key);
+                location.reload();
             }
            
         </script>
 		
-		<div data-role="footer" data-position="fixed">
+		<div data-role="footer" data-position="fixed" id="footerino">
 			<p>Made by Joosep Tiismus 134552IAPB43</p>
 			<button onclick="destroyAll()">Delete Favorites in Storage</button>
 		</div>
@@ -98,9 +102,10 @@
 	<!-- Popular -->
 
     <div id="popular" data-role="page">
-		<div data-role="header">
+		<div data-role="header" id="headerino">
 			<h1>Popular</h1>
             <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
+            <div class='error' style='display:none' id="favoriteCheck">Added to Favorites</div>
         </div>
 		<div data-role="main" class="ui-content">
             <div id="mostPopular"></div>
@@ -120,12 +125,12 @@
 				                $('#mostPopular').append(
                                         '<br>' + 
                                         '<ul data-role="listview">' + 
-                                        '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+movieName+'¤'+movieDescription+'¤'+imageSource+'¤'+showID+'\');">' +
+                                        '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+movieName+'¤'+imageSource+'¤'+showID+'\');">' +
                                         '<img src= "http://image.tmdb.org/t/p/w300' +
                                         datas.results[i].poster_path +
                                         '" height="70">' + 
                                         datas.results[i].name + 
-                                        '<a href="#" data-icon="star" onclick="addToFavorites(\''+movieName+'¤'+imageSource+'¤'+movieDescription+'\');">&nbsp;</a></a></li></ul>');
+                                        '<a href="#" data-icon="star" onclick="addToFavorites(\''+movieName+'¤'+imageSource+'¤'+showID+'\');">&nbsp;</a></a></li></ul>');
                             }
                         })
                         .fail(function(error) {
@@ -135,7 +140,7 @@
                 getPopular();
             </script>
 		</div>
-		<div data-role="footer" data-position="fixed">
+		<div data-role="footer" data-position="fixed" id="footerino">
 			<p>Made by Joosep Tiismus 134552IAPB43</p>
 		</div>
     </div>
@@ -143,13 +148,15 @@
 	<!-- Search -->
 
     <div id="search" data-role="page">
-		<div data-role="header">
+		<div data-role="header" id="headerino">
 			<h1>Search new shows</h1>
+			<div class='error' style='display:none' id="favoriteCheck">Added to Favorites</div>
 			<a href="#home" data-transition="slide" data-direction="reverse">Home</a>
 		</div>
 		<div data-role="main" class="ui-content">
             <input type="text" name="searches" id="searches" autofocus> <br>
-            <div id="results" data-role="listview"></div>   
+            <div id="results"></div>   
+            <p>Previous searches</p>
             <div id="history"></div>
             
             <script>
@@ -181,7 +188,7 @@
                     $.get(url, { api_key: apiKey, query: data })
                         .done(function (datas) {
                             console.log(datas);
-                        
+                            
 				            for(i=0;i<15;i++){
                                 var movieName = datas.results[i].name;
                                 var movieDescriptionUno = datas.results[i].overview;
@@ -189,14 +196,11 @@
                                 var showID = datas.results[i].id;
                                 var imageSource = "http://image.tmdb.org/t/p/w300" + datas.results[i].poster_path;
 				                $('#results').append(
-                                        '<br>'+
-                                       '<ul data-role="listview">' +
-                                        '<li><a href="#show" data-transition="slide" onclick="OneMoviePage(\''+movieName+'¤'+movieDescription+'¤'+imageSource+'¤'+showID+'\');">' + 
-                                        '<img src= "http://image.tmdb.org/t/p/w300' +
-                                        datas.results[i].poster_path +
-                                        '" height="70">' + 
+                                       
+                                       '<ul data-role="listview"><div id="weirdSearch"><img src= "http://image.tmdb.org/t/p/w300' +datas.results[i].poster_path +'" height="70">' +
+                                        '<a href="#show" id="searchFindFavorites" data-transition="slide" onclick="OneMoviePage(\''+movieName+'¤'+imageSource+'¤'+showID+'\');">' + 
                                         datas.results[i].name + 
-                                        '</a></li></ul>'
+                                        '<a href="#" data-icon="star" id="searchFavorites" onclick="addToFavorites(\''+movieName+'¤'+imageSource+'¤'+showID+'\');">ADD TO FAVORITES</a></a></div></ul>'
                                 );
                             }
                         })
@@ -215,11 +219,11 @@
 	<!-- Single Movie -->
 
 	<div id="show" data-role="page">
-		<div data-role="header">
+		<div data-role="header" id="headerino">
 			<h1 id="showTitle"></h1>
             <a href="#home" data-transition="slide" data-direction="reverse">Home</a>
 		</div>
-		<div data-role="main" class="ui-content">
+		<div data-role="main" class="ui-content" id="bodyBody">
 			<ul data-role="listview">
 				<img src="ss.png" alt="No Picture Available" id="superImage">
 				<p id="showDescription"></p>
@@ -231,6 +235,9 @@
 		</div>
 		
 		<script>
+            
+    
+            
             function OneMoviePage(name){
                 
                 $("#showTitle").empty();
@@ -242,34 +249,52 @@
                 
                 var splitString = name.split("¤");
                 $('#showTitle').append(splitString[0]);
-                $('#showDescription').append(splitString[1]);
-                $('#superImage').attr("src", splitString[2]);
+                $('#superImage').attr("src", splitString[1]);
                 $('#trailerino').append('<a href="http://www.youtube.com/results?search_query='+splitString[0]+'+trailer" id="mainTrailer">Trailer</a>');
-                $('#favoritePlease').append('<a href="#" data-icon="star" onclick="addToFavorites(\''+splitString[0]+'¤'+splitString[2]+'¤'+splitString[1]+'\');">Add to Favorites &nbsp;</a>');
                 
-                var showID = splitString[3];
-                console.log("SELLE FKAIN SHOW ID ON : " + showID);
+                var showID = splitString[2];
                 var apiKey = "609ebf66c9f448c9c1f5a207ad8b7bd2";
                 var urlid = "http://api.themoviedb.org/3/tv/" + showID;
                 
+                var episodeDiv = document.getElementById('episodeList');
+                episodeDiv.innerHTML = localStorage.getItem(localStorage.key(showID));
                     $.get(urlid, { api_key: apiKey })
                         .done(function (datas) {
                             var episodeCount = datas.number_of_episodes;
+                            var plotSummary = datas.overview;
                             console.log(episodeCount);
-				            for(i=0;i<episodeCount;i++){
-				                $('#episodeList').append( "<li><p for='flip-1'>Episode number: " + i +"   "+
-                                "<select name='flip-1' id='flip-1' data-role='slider'><option value='off'>Not seen</option><option value='on'>Seen</option></select> " +
-                                "</li></p>"
+                            $('#showDescription').append("<p id=showText>"+ plotSummary +"</p>");
+                        
+				            for(i=1;i<episodeCount+1;i++){
+				                $('#episodeList').append( "<li><p for='flip-1'>Episode : " + i +"<input type='checkbox' id='"+showID+":"+i+"' onclick='checkBoxFunction("+i+","+showID+");'/></p></li>  "
                                 );
+                                localStorage.getItem(showID+":"+i) ? document.getElementById(showID+":"+i).checked = true : "";
                             }
+                       
                         })
                         .fail(function(error) {
                             console.error(error);
                         });
+                
             }
+            
+            function checkBoxFunction(episodeID,showID){
+                var checkbox = document.getElementById(showID+":"+episodeID);
+                var checked = JSON.parse(localStorage.getItem(showID+":"+episodeID));
+                console.log("I am doing something");
+                if (checked == true) {
+                    console.log("I did CHECKS");
+                    localStorage.removeItem(showID+":"+episodeID);
+                }else{
+                localStorage.setItem(showID+":"+episodeID, true);
+                }
+            }
+           
+    
+           
         </script>
 		
-		<div data-role="footer" data-position="fixed">
+		<div data-role="footer" data-position="fixed" id="footerino">
 			<p>Made by Joosep Tiismus 134552IAPB43</p>
 		</div>
 </body>

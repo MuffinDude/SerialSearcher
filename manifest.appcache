@@ -1,5 +1,12 @@
 CACHE MANIFEST
 
+CACHE:
+/code/jquery-2.2.0.min.js
+/code/jquery.mobile-1.4.5.min.css
+/code/jquery.mobile-1.4.5.min.js
+/
+
+
 NETWORK:
 *
 
